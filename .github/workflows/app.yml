@@ -30,7 +30,9 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r apps/sample-api/requirements.txt
-      - run: pytest -q apps/sample-api/tests
+            - name: Run tests
+        working-directory: apps/sample-api
+        run: pytest -q
 
   build-scan-push:
     needs: test
