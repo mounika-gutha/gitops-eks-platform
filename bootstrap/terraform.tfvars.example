@@ -1,0 +1,7 @@
+aws_region          = "ap-south-1"
+owner               = "<OWNER>"
+cost_center         = "<COST_CENTER>"
+state_bucket_name   = "<UNIQUE_TF_STATE_BUCKET_NAME>"
+lock_table_name     = "gitops-eks-platform-terraform-lock"
+github_repository   = "<GITHUB_ORG>/<GITHUB_REPO>"
+github_oidc_thumbprint = "<GITHUB_OIDC_THUMBPRINT>"

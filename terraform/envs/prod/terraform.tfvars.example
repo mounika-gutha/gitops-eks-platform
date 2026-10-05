@@ -1,0 +1,8 @@
+aws_region          = "ap-south-1"
+project             = "gitops-eks-platform"
+env                 = "prod"
+owner               = "<OWNER>"
+cost_center         = "<COST_CENTER>"
+gitops_repo_url     = "<GITOPS_REPO_URL>"
+gitops_revision     = "main"
+budget_alert_email  = "<BUDGET_ALERT_EMAIL>"

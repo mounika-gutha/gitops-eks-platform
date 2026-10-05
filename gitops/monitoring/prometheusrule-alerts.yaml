@@ -1,0 +1,105 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: platform-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: platform.rules
+      rules:
+        - alert: KubernetesPodCrashLooping
+          expr: max_over_time(kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"}[10m]) > 0
+          for: 10m
+          labels:
+            severity: critical
+            summary: Pod is crash looping
+            runbook_url: <DOCS_HOST>/runbook.md#crashloopbackoff
+          annotations:
+            description: "A Kubernetes container has remained in CrashLoopBackOff for more than ten minutes."
+
+        - alert: KubernetesNodeNotReady
+          expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+          for: 10m
+          labels:
+            severity: critical
+            summary: Kubernetes node is not ready
+            runbook_url: <DOCS_HOST>/runbook.md#nodenotready
+          annotations:
+            description: "A Kubernetes node has not reported Ready status for ten minutes."
+
+        - alert: NodeHighCPU
+          expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+          for: 15m
+          labels:
+            severity: warning
+            summary: Node CPU is high
+            runbook_url: <DOCS_HOST>/runbook.md#high-cpu
+          annotations:
+            description: "Node CPU usage has exceeded 85 percent for fifteen minutes."
+
+        - alert: NodeHighMemory
+          expr: 100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) > 90
+          for: 10m
+          labels:
+            severity: warning
+            summary: Node memory is high
+            runbook_url: <DOCS_HOST>/runbook.md#high-memory
+          annotations:
+            description: "Node memory usage has exceeded 90 percent."
+
+        - alert: ApplicationHigh5xxRate
+          expr: |
+            (
+              sum(rate(http_requests_total{status=~"5.."}[5m]))
+              /
+              clamp_min(sum(rate(http_requests_total[5m])), 1)
+            ) > 0.05
+          for: 10m
+          labels:
+            severity: critical
+            summary: Application 5xx rate is high
+            runbook_url: <DOCS_HOST>/runbook.md#high-5xx-rate
+          annotations:
+            description: "The sample application HTTP 5xx ratio is above five percent."
+
+        - alert: ArgoCDApplicationOutOfSync
+          expr: argocd_app_info{sync_status!="Synced"} > 0
+          for: 10m
+          labels:
+            severity: warning
+            summary: Argo CD application is out of sync
+            runbook_url: <DOCS_HOST>/runbook.md#argocd-out-of-sync
+          annotations:
+            description: "An Argo CD application has remained out of sync for ten minutes."
+
+        - alert: ArgoCDApplicationDegraded
+          expr: argocd_app_info{health_status="Degraded"} > 0
+          for: 10m
+          labels:
+            severity: critical
+            summary: Argo CD application is degraded
+            runbook_url: <DOCS_HOST>/runbook.md#argocd-degraded
+          annotations:
+            description: "An Argo CD application has remained degraded for ten minutes."
+
+        - alert: NodeDiskPressure
+          expr: node_filesystem_avail_bytes{mountpoint="/",fstype!=""} / node_filesystem_size_bytes{mountpoint="/",fstype!=""} < 0.10
+          for: 15m
+          labels:
+            severity: warning
+            summary: Node disk space is low
+            runbook_url: <DOCS_HOST>/runbook.md#disk-pressure
+          annotations:
+            description: "Available root filesystem space is below ten percent."
+
+        - alert: CertificateExpirySoon
+          expr: (probe_ssl_earliest_cert_expiry - time()) < 7 * 24 * 3600
+          for: 1h
+          labels:
+            severity: warning
+            summary: TLS certificate expires soon
+            runbook_url: <DOCS_HOST>/runbook.md#certificate-expiry
+          annotations:
+            description: "A monitored TLS certificate expires within seven days."

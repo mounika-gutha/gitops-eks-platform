@@ -1,0 +1,31 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "graphTooltip": 0,
+  "panels": [
+    {
+      "type": "logs",
+      "title": "Application Logs",
+      "targets": [
+        {
+          "expr": "{namespace=\"sample-api-dev\"}"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": [
+    "gitops-eks-platform"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "title": "Logs Explorer",
+  "version": 1
+}

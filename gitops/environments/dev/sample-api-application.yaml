@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sample-api-dev
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "30"
+spec:
+  project: default
+  source:
+    repoURL: <GITOPS_REPO_URL>
+    targetRevision: main
+    path: charts/sample-api
+    helm:
+      valueFiles:
+        - ../../gitops/environments/dev/values-dev.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: sample-api-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

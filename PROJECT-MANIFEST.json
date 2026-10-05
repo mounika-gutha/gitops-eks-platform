@@ -1,0 +1,15 @@
+{
+  "project": "gitops-eks-platform",
+  "mode": "scaffold-only",
+  "region": "ap-south-1",
+  "environments": [
+    "dev",
+    "prod"
+  ],
+  "dummy_aws_account_ids": [
+    "000000000000",
+    "111111111111"
+  ],
+  "real_account_placeholder": "<AWS_ACCOUNT_ID>",
+  "secret_policy": "No real secrets or phone numbers are stored in repository."
+}

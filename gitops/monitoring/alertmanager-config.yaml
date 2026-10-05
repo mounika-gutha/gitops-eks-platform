@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alertmanager-config
+  namespace: monitoring
+type: Opaque
+stringData:
+  alertmanager.yaml: |
+    global:
+      resolve_timeout: 5m
+
+    route:
+      receiver: opsgenie-warning
+      group_by: ["alertname", "namespace"]
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 4h
+      routes:
+        - matchers:
+            - severity="critical"
+          receiver: opsgenie-critical
+        - matchers:
+            - severity="warning"
+          receiver: opsgenie-warning
+
+    receivers:
+      - name: opsgenie-critical
+        opsgenie_configs:
+          - api_key_file: /etc/alertmanager/secrets/alertmanager-opsgenie/api-key
+            priority: P1
+            send_resolved: true
+
+      - name: opsgenie-warning
+        opsgenie_configs:
+          - api_key_file: /etc/alertmanager/secrets/alertmanager-opsgenie/api-key
+            priority: P3
+            send_resolved: true
+
+    # Swappable examples:
+    # - PagerDuty: use pagerduty_configs with a Secret-managed routing key.
+    # - Slack: use slack_configs with a Secret-managed webhook URL.

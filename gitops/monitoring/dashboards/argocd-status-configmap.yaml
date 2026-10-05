@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-argocd-status
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  argocd-status.json: |
+    {
+      "annotations": {
+        "list": []
+      },
+      "editable": true,
+      "graphTooltip": 0,
+      "panels": [
+        {
+          "type": "stat",
+          "title": "Applications",
+          "targets": [
+            {
+              "expr": "count(argocd_app_info)"
+            }
+          ]
+        },
+        {
+          "type": "stat",
+          "title": "Degraded",
+          "targets": [
+            {
+              "expr": "count(argocd_app_info{health_status=\"Degraded\"})"
+            }
+          ]
+        }
+      ],
+      "schemaVersion": 39,
+      "tags": [
+        "gitops-eks-platform"
+      ],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "title": "Argo CD Status",
+      "version": 1
+    }

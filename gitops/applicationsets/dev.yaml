@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: dev-apps
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - app: sample-api
+            namespace: sample-api-dev
+            values: gitops/environments/dev/values-dev.yaml
+  template:
+    metadata:
+      name: "{{app}}-dev"
+    spec:
+      project: default
+      source:
+        repoURL: <GITOPS_REPO_URL>
+        targetRevision: main
+        path: charts/sample-api
+        helm:
+          valueFiles:
+            - ../../{{values}}
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
